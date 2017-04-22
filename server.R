@@ -83,7 +83,7 @@ getNbOccuConcept<-memoise(function(df){
   conceptName <- unique.data.frame(conceptName)
   statDesCui<-merge(conceptName, statDesCui, by="CUI")
   statDesCui$CUI<-NULL
-  colnames(statDesCui)<-c("Nom du concept","Pourcentage par article","Fréquence d'apparition")
+  colnames(statDesCui)<-c("Nom du concept","Présence dans les textes (en %)","Nombre d'apparition dans les textes")
   statDesCui<-statDesCui[order(statDesCui[[2]],decreasing = T),]
   rownames(statDesCui)<-NULL
   return(statDesCui)
