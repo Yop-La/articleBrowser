@@ -60,19 +60,14 @@ load(file = "data.RData")
 
 
 getData<-memoise(function(SemTypes, onlyInPhrase){
-  df1 = df
-  nrowReturn = nrow(df)
-  filterSemTypes = TRUE
-  if(length(SemTypes) != 0){
-    filterSemTypes = df$semTypes %in% SemTypes
-    nrowReturn = length(filterSemTypes)
-    df1 = unique.data.frame(df[,c("PMID","phraseText","CUI","concept")])
-  }
-  filterOnlyInPhrase = rep(TRUE,nrowReturn)  
+  df1 <- df
   if(onlyInPhrase){
-    filterOnlyInPhrase = (df1$linkToTLS == TRUE)
+    df1 <- df[df$linkToTLS==TRUE,]
   }
-  return(df1[which(filterOnlyInPhrase & filterSemTypes),])
+  if(length(SemTypes)!=0){
+    df1 <- df1[grepl(paste(SemTypes,sep="|"),df1$semTypes),]
+  }
+  return(df1)
 })
 getNbOccuConcept<-memoise(function(df){
   setProgress(message = "Processing data...")
