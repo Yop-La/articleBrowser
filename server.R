@@ -177,7 +177,7 @@ shinyServer(function(input, output) {
   
   
   articlesResult <- reactiveValues(
-    str="Cliquez sur un concept dans l'onglet tab pour voir les articles mentionnant le concept de votre choix ici !",
+    str="Cliquez sur un concept dans l'onglet tab pour voir les textes mentionnant le concept de votre choix ici !",
     empty=TRUE
   )
   
