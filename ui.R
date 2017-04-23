@@ -35,7 +35,7 @@ shinyUI(fluidPage(
         mais aussi d'afficher les articles contenant un certain concept. 
         Les critères ci dessous permettent de spécifier les concepts à considérer
         (ils sont tous considérés par défaut)"),
-      h4("Filtrer selon le type sémantique"),
+      h4("Resteindre à un ou plusieurs types sémantique"),
       p("L'onglet 'type sémantique' permet de spécifier la ou les familles de concept à considérer. 
         Par défaut, tous les concepts sont considérés. 
         Cela permet de ne considérer que les concepts de la famille cellule par exemple."),

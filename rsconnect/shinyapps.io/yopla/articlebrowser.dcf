@@ -2,7 +2,7 @@ name: articlebrowser
 title:
 account: yopla
 server: shinyapps.io
-appId: 166038
-bundleId: 778334
+appId: 170926
+bundleId: 799641
 url: https://yopla.shinyapps.io/articlebrowser/
-when: 1491419365.53096
+when: 1492896093.35869
