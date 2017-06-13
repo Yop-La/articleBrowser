@@ -14,7 +14,7 @@ shinyUI(
   navbarPage("ArticleBrowser",
              
              
-             #####################    premier panel    ###############################
+             #####################    premier panel    ##############################
              
              
              source("./uiside/panel_elaboration_requete.R")$value,

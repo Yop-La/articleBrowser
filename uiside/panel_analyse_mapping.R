@@ -1,5 +1,5 @@
-# code de l'ui du panel "Analyse du mapping"
-# créé le 12/06/2017 à 14h51
+## code de l'ui du panel "Analyse du mapping"
+## créé le 12/06/2017 à 14h51
 
 tabPanel("Analyse du mapping", 
          fluidPage(
