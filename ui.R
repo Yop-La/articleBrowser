@@ -17,7 +17,7 @@ shinyUI(
              #####################    premier panel    ##############################
              
              
-             source("./uiside/panel_elaboration_requete.R")$value,
+             source("./uiside/panel_elaboration_requete.R", encoding="utf-8")$value,
              
              #####################    deuxième panel    ###############################
              
@@ -25,7 +25,7 @@ shinyUI(
 
              #####################    troisième panel    ###############################
                           
-             source("./uiside/panel_analyse_mapping.R")$value
+             source("./uiside/panel_analyse_mapping.R", encoding="utf-8")$value
              
   ) #navBarPage
 ) #sihnyUI
