@@ -15,9 +15,9 @@ tabPanel("Sélection des mots clés",
                                   NULL, 
                                   value = "", 
                                   width = NULL, 
-                                  placeholder = "Saisir votre terme puis cliquez sur rechercher")),
+                                  placeholder = "Saisir votre terme puis cliquez sur go")),
                  column(3,
-                        actionButton("search", "Rechercher"))),
+                        actionButton("search", "Go !"))),
                h4("Les concepts choisis"),
                selectizeInput("inputId", 
                               label= "Concepts à trouver dans les textes", 
@@ -36,7 +36,43 @@ tabPanel("Sélection des mots clés",
                             column(3,
                                    div(DT::dataTableOutput('concepts_res'),align="center")
                             ),
-                            column(9,div("texte"))
+                            column(9,
+                                   fluidRow(
+                                     column(12,
+                                            div(
+                                              strong("Concept sélectionné :"),
+                                              htmlOutput("conceptName", inline = TRUE)
+                                            )
+                                            
+                                     )
+                                   ),
+                                   fluidRow(
+                                     column(12,
+                                            div(
+                                              strong("Type sémantique :"),
+                                              htmlOutput("semType", inline = TRUE)
+                                            )                                     
+                                     )
+                                   ),
+                                   fluidRow(
+                                     column(7,
+                                            div(
+                                              strong(HTML("Définitions du concept </br>")),
+                                              div(DT::dataTableOutput('concept_defs'),align="center")
+                                            )
+                                            
+                                     ),
+                                     column(5,
+                                            div(
+                                              strong(HTML("Synonymes du concept </br>")),
+                                              div(DT::dataTableOutput('concept_atoms'),align="center")
+                                            )
+                                            
+                                     )
+                                   )
+                                   
+                                   
+                            )
                           )
                  )
                )

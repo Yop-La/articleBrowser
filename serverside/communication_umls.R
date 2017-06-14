@@ -111,6 +111,8 @@ get_atoms_concept<-function(url_atoms_concept){
   warn_for_status(r)
   search_results<-content(r,"text") #résultat de la recherche au format json
   search_results<-fromJSON(search_results)
+  #suppresion d'un element de la liste pour transformation en data.frame
+  search_results$result$contentViewMemberships<-NULL  
   return(search_results)
 }
 

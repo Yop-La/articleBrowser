@@ -3,7 +3,6 @@
 # ce script est appelé dans server.R. Il utilise d'ailleurs deux variables de server.R que sont :
 # output et input de la fonction shinyServer 
 
-
 #pour lancer la recherche de concept quand sur le bouton "chercher"
 get_search_results <- eventReactive(input$search, {
   research_term(input$term)
@@ -24,7 +23,7 @@ output$concepts_res <- DT::renderDataTable({
       easyClose = TRUE
     ))
   }else{
-  colnames(concepts_table)[4] <- c("Nom des concepts")
+    colnames(concepts_table)[4] <- c("Nom des concepts")
     datatable(concepts_table, 
               selection = 'single',
               rownames = FALSE,
@@ -42,7 +41,39 @@ output$concepts_res <- DT::renderDataTable({
 observeEvent(input$concepts_res_rows_selected, {
   input$table_rows_selected
   url_info_concept <- concepts_table[input$concepts_res_cell_clicked$row,3]
-  info_concept <- get_info_concept(url_info_concept)
-  print(info_concept$atoms )
-  data_test <<-info_concept$atoms 
+  withProgress(message = 'Recherche des infos sur le concept choisi ...',{
+    info_concept <- get_info_concept(url_info_concept)
+  })
+  
+  
+  output$conceptName <-  renderUI({HTML(info_concept$concept$name)}) #affichage nom concept choisi
+  output$semType <-  renderUI({HTML(info_concept$semTypes$name)}) #affichage nom type sémantique choisi
+  
+  output$concept_atoms <- DT::renderDataTable({
+    datatable(info_concept$atoms, 
+              selection = 'single',
+              rownames = FALSE,
+              options=list(
+                searching = FALSE,
+                columnDefs = list(list(
+                  visible=FALSE, 
+                  targets=c(0:16,18)))
+              )
+    )
+  })
+  
+  output$concept_defs <- DT::renderDataTable({
+    datatable(info_concept$definitions, 
+              selection = 'single',
+              rownames = FALSE,
+              options=list(
+                searching = FALSE,
+                columnDefs = list(list(
+                  visible=FALSE, 
+                  targets=c(0,1,2)))
+              )
+    )
+    
+  })
+  
 })
