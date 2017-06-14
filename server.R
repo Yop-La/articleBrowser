@@ -7,14 +7,12 @@
 #    http://shiny.rstudio.com/
 #
 #
-
 library(shiny)
 library(DT)
 library(XML)
 library(wordcloud)
 library(stringr)
 library(stringi)
-library(stringr)
 library(dclone)
 library(Hmisc)
 library(memoise)

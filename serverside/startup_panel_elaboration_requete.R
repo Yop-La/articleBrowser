@@ -3,3 +3,5 @@
 
 concepts_table <<- NULL
 data_test <<- NULL
+concept_selectionne <<- list()
+key_concepts <<- list()
