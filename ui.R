@@ -21,7 +21,7 @@ shinyUI(
              
              #####################    deuxième panel    ###############################
              
-             tabPanel("Soumission à MetaMap"),
+             tabPanel("Soumission à MetaMap", h1("En travaux !!!!")),
 
              #####################    troisième panel    ###############################
                           

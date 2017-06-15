@@ -10,7 +10,8 @@ tabPanel("Sélection des mots clés",
                  Il s'agit donc de choisir les concepts à chercher dans les articles de pubmed.
                  Suivez les étapes pour y arriver :)"),
                h4("Step 1 - Recherchez un concept"),
-               p("Trouvez ici les concepts à inclure dans la requête."),
+               p("Trouvez ici les concepts à utiliser pour rechercher des articles. 
+                 Attention : il faut saisir des termes anglais"),
                fluidRow(
                  column(9,
                         textInput("term", 

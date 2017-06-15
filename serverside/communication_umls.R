@@ -111,6 +111,15 @@ get_atoms_concept<-function(url_atoms_concept){
   warn_for_status(r)
   search_results<-content(r,"text") #résultat de la recherche au format json
   search_results<-fromJSON(search_results)
+  # on récupère le nombre de pages pour ensuite récupérer tous les atoms
+  pageCount <- search_results$pageCount
+  # on soumet la même requête en précisant qu'on veux tous les résultats sur une même page
+  service_ticket = get_service_ticket(url_service_ticket)
+  query = list(ticket=service_ticket, pageSize = pageCount*25)
+  r<-GET(url_atoms_concept,query=query)
+  warn_for_status(r)
+  search_results<-content(r,"text") #résultat de la recherche au format json
+  search_results<-fromJSON(search_results)
   #suppresion d'un element de la liste pour transformation en data.frame
   search_results$result$contentViewMemberships<-NULL  
   return(search_results)

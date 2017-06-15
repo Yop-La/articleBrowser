@@ -22,6 +22,7 @@ output$concepts_res <- DT::renderDataTable({
     showModal(modalDialog(
       title = "Aucun résultat !",
       div("Aucun concept correspondant au terme saisi"),
+      div("Vérifier l'orthographe. Avez vous bien écrit en anglais ?"),
       div("Renouvellez la recherche !"),
       footer = NULL,
       easyClose = TRUE
