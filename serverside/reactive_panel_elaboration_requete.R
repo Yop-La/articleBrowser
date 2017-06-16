@@ -4,7 +4,7 @@
 # output et input de la fonction shinyServer 
 
 
-
+source("./serverside/fonctions_creation_requete_pubmed.R",local=TRUE, encoding="utf-8")
 
 
 #pour lancer la recherche de concept quand sur le bouton "chercher"
@@ -137,6 +137,16 @@ observeEvent(input$conceptsKey, ignoreNULL = FALSE, ignoreInit = FALSE,{
 })
 
 # action du bouton "lancer la recherche d'articles"
+# quand on lance la recherche, toute la requête élaborée par l'utilisateur est dans
+# l'objet key_concepts qui est une liste des concepts choisis par l'utilisateur
+# chaque élément de cette liste contient donc les infos d'un concept choisi par l'utilisateur
+# les attributs d'un élement de cette liste sont :
+# $concept ( $cui $name)
+# $semTypes ( $name $uri)
+# $definitions ($value ...)
+# $atoms qui est un data frame avec comme colonne d'intérêt : name
+# pour élaborer la requête, il faut récupérer tous les synonymes de chaque concept
+
 observeEvent(input$findArticles,{
   if(length(key_concepts) == 0){
     showModal(modalDialog(
@@ -149,7 +159,7 @@ observeEvent(input$findArticles,{
   }else{
     showModal(modalDialog(
       title = "En développement ....",
-      div("La recherche d'articles à l'aide des concepts choisi n'est pas encore développé ..."),
+      div(getPubmedQuery(key_concepts)),
       footer = NULL,
       easyClose = TRUE
     ))

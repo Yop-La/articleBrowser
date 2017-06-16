@@ -1,4 +1,5 @@
 # script chargé au démarrage pour s'authentifier auprès de l'UMLS - délivre les tickets pour utiliser l'UMLS
+# script aussi chargé de requêter l'UMLS
 # créé le 12/06/2017
 # ce script est appelé dans server.R. 
 
@@ -115,7 +116,7 @@ get_atoms_concept<-function(url_atoms_concept){
   pageCount <- search_results$pageCount
   # on soumet la même requête en précisant qu'on veux tous les résultats sur une même page
   service_ticket = get_service_ticket(url_service_ticket)
-  query = list(ticket=service_ticket, pageSize = pageCount*25)
+  query = list(ticket=service_ticket, pageSize = pageCount*25, language = "ENG")
   r<-GET(url_atoms_concept,query=query)
   warn_for_status(r)
   search_results<-content(r,"text") #résultat de la recherche au format json
