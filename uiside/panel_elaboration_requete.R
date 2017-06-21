@@ -1,7 +1,7 @@
 ## code de l'ui du panel "Elaboration de la requête"
 ## créé le 12/06/2017 à 14h51
 
-tabPanel("Sélection des mots clés",
+tabPanel("Spécification de la recherche",
          fluidPage( 
            sidebarLayout(
              sidebarPanel(

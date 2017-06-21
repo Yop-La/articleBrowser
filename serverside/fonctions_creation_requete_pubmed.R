@@ -6,11 +6,14 @@
 getPubmedQuery<-function(key_concepts){
   conceptsPQuery <- sapply(key_concepts, getConceptPQuery)
   conceptPsQuery = paste(conceptsPQuery,collapse = " AND ")
+  conceptPsQuery<- gsub(" ","+",conceptPsQuery) # les espace sont encodés par un + dans pubmed
   return(conceptPsQuery)
 }
 
 getConceptPQuery<-function(concept){
-  conceptPQuery = paste(concept$atoms$name,collapse = "\"[All Fields] OR \"")
-  conceptPQuery = paste("(\"",conceptPQuery,"\")",sep = "")
+  termEncoded<-sapply(concept$atoms$name, function(x) {URLencode(x,reserved = TRUE)})
+  termEncoded<- gsub("%20","+",termEncoded) # les espace sont encodés par un + dans pubmed
+  conceptPQuery = paste(termEncoded,collapse = "\"[All Fields] OR \"")
+  conceptPQuery = paste("(\"",conceptPQuery,"\"[All Fields])",sep = "")
   return(conceptPQuery)
 }

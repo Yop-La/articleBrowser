@@ -5,6 +5,10 @@
 
 
 source("./serverside/fonctions_creation_requete_pubmed.R",local=TRUE, encoding="utf-8")
+source("./serverside/communication_pubmed.R",local=TRUE, encoding="utf-8")
+source("./serverside/entrezDataPipeline.R",local=TRUE, encoding="utf-8")
+source("./serverside/xmlParser.R",local=TRUE, encoding="utf-8")
+source("./serverside/formatXmlParsing.R",local=TRUE, encoding="utf-8")
 
 
 #pour lancer la recherche de concept quand sur le bouton "chercher"
@@ -157,9 +161,34 @@ observeEvent(input$findArticles,{
       easyClose = TRUE
     ))
   }else{
+    #esearchRes<-pSearchTerms(getPubmedQuery(key_concepts))
+    withProgress(message = 'Recherche des articles en cours',{
+      res_esearch <- getXmlPubmedArticles(key_concepts) #res_esearch est null si plus de 10000 articles
+      #cela enregistre le xml sur le disque
+    })
+    msg = "Mieux spécifier votre recherche car elle renvoie plus de 10000 articles"
+    if(!is.null(res_esearch)){
+      msg <- "Tout s'est bien passé : "  
+      msg <- paste(msg, res_esearch$count," abstract trouvés sur pubmed",sep = "")
+      msg <- HTML(paste(
+          msg,
+          "</br> Consultez le résultat de la recherche dans l'onglet \"Consultation des articles\"",
+          sep = ""
+        )
+        )
+      articles_res<-processXmlPubmed()
+      output$articles_research <- DT::renderDataTable({
+        datatable(articles_res, 
+                  selection = 'none',
+                  rownames = FALSE
+        )
+        
+      })
+      
+    }
     showModal(modalDialog(
       title = "En développement ....",
-      div(getPubmedQuery(key_concepts)),
+      msg, #getPubmedQuery(key_concepts)
       footer = NULL,
       easyClose = TRUE
     ))

@@ -1,0 +1,3 @@
+todo :
+
+- corriger le bug qui se produit quand une recherche d'uid renvoie trop d'enregistrements (quand on tape obeisty pex)

@@ -21,7 +21,7 @@ shinyUI(
              
              #####################    deuxième panel    ###############################
              
-             tabPanel("Soumission à MetaMap", h1("En travaux !!!!")),
+             source("./uiside/panel_consultation_article.R", encoding="utf-8")$value,
 
              #####################    troisième panel    ###############################
                           
