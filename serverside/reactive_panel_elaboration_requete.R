@@ -171,18 +171,26 @@ observeEvent(input$findArticles,{
       msg <- "Tout s'est bien passé : "  
       msg <- paste(msg, res_esearch$count," abstract trouvés sur pubmed",sep = "")
       msg <- HTML(paste(
-          msg,
-          "</br> Consultez le résultat de la recherche dans l'onglet \"Consultation des articles\"",
-          sep = ""
-        )
-        )
-      articles_res<-processXmlPubmed()
+        msg,
+        "</br> Consultez le résultat de la recherche dans l'onglet \"Consultation des articles\"",
+        sep = ""
+      )
+      )
+      articles_research<<-processXmlPubmed()
       output$articles_research <- DT::renderDataTable({
         datatable(articles_res, 
-                  selection = 'none',
-                  rownames = FALSE
+                  selection = 'single',
+                  rownames = FALSE,
+                  options=list(
+                    # bLengthChange = FALSE,
+                    # paging = FALSE,
+                    # pageLength = 10,
+                    # searching = FALSE,
+                    columnDefs = list(list(
+                      visible=FALSE, 
+                      targets=c(4)))
+                  )
         )
-        
       })
       
     }

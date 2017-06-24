@@ -10,16 +10,11 @@
 #   - la date de création des articles pubmed 
 # cela concerne les articles renvoyés par la recherche d'articles
 setDataFramePArticles<-function(){
-  titles <- extrctPubmedTitle("pubmedRecord.xml")
-  dateCreated <- extrctPDateCreated("pubmedRecord.xml")
-  PMID <- extrctPMID("pubmedRecord.xml")
-  AbbrJournal<-extrctPAbbrJournal("pubmedRecord.xml")
-  ret <- data.frame(
-    as.character(PMID),
-    as.character(titles),
-    as.character(dateCreated),
-    as.character(AbbrJournal)
-  )
+  articles <- extrctPubmedArticle("pubmedRecord.xml")
+  ret <- data.frame(matrix(unlist(articles), 
+                                 nrow=length(articles), 
+                                 byrow=T),stringsAsFactors = FALSE)
+
   ret[[3]]<-as.Date(
     sapply(
       ret[[3]],
@@ -28,16 +23,13 @@ setDataFramePArticles<-function(){
       }
     )
   )
-  colnames(ret)<-c("PMID","title","creationDate","AbbrJournal")
+  colnames(ret)<-c("PMID","title","creationDate","AbbrJournal","Abstract")
   return(ret)
 }
 
-savePAbstract<-function(){
-  abstracts <- extrctPubmedAbstract("pubmedRecord.xml")
-  save(abstracts,file = "abstracts.RData")  
-}
-
 processXmlPubmed<-function(){
-  #savePAbstract()
-  return(setDataFramePArticles())
+  tab_articles<-setDataFramePArticles()
+  # save(tab_articles[[5]],file = "abstracts.RData")  
+  # tab_articles[[5]]<-NULL
+  return(tab_articles)
 }

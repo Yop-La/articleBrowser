@@ -2,59 +2,60 @@
 # créé le 20/06/2017
 # ce script est appelé dans server.R. 
 
-# renvoie tous les infos utiles des articles pubmed 
+# renvoie tous les infos utiles des articles pubmed
 extrctPubmedArticle<-function(xmlFile){
   xmlTree<-xmlParse(file=xmlFile)
   abstracts=xpathApply(
     xmlTree,
-    "//PubmedArticle", 
+    "//PubmedArticle",
     formArticle)
   return(abstracts)
 }
-res<-extrctPubmedArticle("pubmedRecord.xml")
+
 formArticle<-function(ArticleNode){
   abstract<-formAbstract(ArticleNode)
-  
-  
-  titles=xpathApply(
+
+
+  titles=xpathSApply(
     ArticleNode,
-    "MedlineCitation/Article/ArticleTitle", 
-    xmlValue)
-  
-  PMID=xpathApply(
+    "MedlineCitation/Article/ArticleTitle",
+    xmlValue,
+    simplify=)
+
+  PMID=xpathSApply(
     ArticleNode,
-    "MedlineCitation/PMID", 
+    "MedlineCitation/PMID",
     xmlValue)
-  
-  DateCreated=xpathApply(
+
+  DateCreated=xpathSApply(
     ArticleNode,
-    "MedlineCitation/DateCreated", 
+    "MedlineCitation/DateCreated",
     xmlValue)
-  
-  AbbrJournal=xpathApply(
+
+  AbbrJournal=xpathSApply(
     ArticleNode,
-    "MedlineCitation/Article/Journal/ISOAbbreviation", 
+    "MedlineCitation/Article/Journal/ISOAbbreviation",
     xmlValue)
-  
-  return(list(titles,PMID, DateCreated, AbbrJournal,abstract))
+
+  return(c(PMID, titles, DateCreated, AbbrJournal,abstract))
 }
 
-
-# # renvoie tous les abstracts d'un fichier xml de pubmed
-# extrctPubmedAbstract<-function(xmlFile){
-#   xmlTree<-xmlParse(file="pubmedRecord.xml")
-#   abstracts=xpathApply(
-#     xmlTree,
-#     "//Abstract", 
-#     formAbstract)
-#   return(abstracts)
-# }
+# renvoie tous les abstracts d'un fichier xml de pubmed
+extrctPubmedAbstract<-function(xmlFile){
+  xmlTree<-xmlParse(file="pubmedRecord.xml")
+  abstracts=xpathApply(
+    xmlTree,
+    "//Abstract",
+    formAbstract)
+  return(abstracts)
+}
 
 formAbstract<-function(AbstractNode){
-  abstract=xpathApply(
+  abstract=xpathSApply(
     AbstractNode,
     "MedlineCitation/Article/Abstract/AbstractText", 
     xmlValue)
+  abstract=paste(abstract,collapse = "<br/> <br/>")
   return(abstract)
 }
 
