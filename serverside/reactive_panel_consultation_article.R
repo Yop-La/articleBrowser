@@ -3,14 +3,9 @@
 # ce script est appelé dans server.R. Il utilise d'ailleurs deux variables de server.R que sont :
 # output et input de la fonction shinyServer 
 
+source("./serverside/formatToMedline.R",local=TRUE, encoding="utf-8")
+source("./serverside/mappArticles.R",local=TRUE, encoding="utf-8")
 
-# output$articles_research <- DT::renderDataTable({
-#   datatable(data.frame(c("machin","truc","bidule")), 
-#             selection = 'none',
-#             rownames = FALSE
-#   )
-# })
-# 
 
 # pour afficher le résumé de l'article cliqué
 observeEvent(input$articles_research_rows_selected, {
@@ -35,15 +30,35 @@ observeEvent(input$articles_research_rows_selected, {
   ))
 })
 
- observeEvent(input$getFullArticle,{
-   .jinit('.')
-   .jaddClassPath('./test.jar')
-   obj=.jnew("test")
-   j<-3
-   result=.jcall(obj,"I","test",as.integer(j))
-   print(j)
- })
- 
+observeEvent(input$startMapping,{
+  saveArticlesToMedlineFormat(articles_research,"./articles.medline")
+  
+  # startMapping<<-future({
+  #   mappArticles("./articles.medline")
+  #   sender <- "alex.guillemine@gmail.com"
+  #   recipients <- sender
+  #   send.mail(from = sender,
+  #             to = sender,
+  #             subject = "Subject of the email",
+  #             body = "Body of the email",
+  #             smtp = list(host.name = "smtp.gmail.com", port = 587,
+  #                         user.name = sender,
+  #                         passwd = "Bgrnht12g!", ssl = TRUE),
+  #             authenticate = TRUE,
+  #             send = TRUE)
+  # }) %plan% multiprocess
+
+
+  # mappArticles("./articles.medline")
+  showModal(modalDialog(
+    title = "En développement ...",
+    div("Vos articles sont en cours de mappage. Vous recevrez un mail une fois le mappage terminé avec un lien 
+        à utiliser dans l'application"),
+    footer = NULL,
+    easyClose = TRUE
+  ))
+})
+
 
 
 

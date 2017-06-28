@@ -99,8 +99,8 @@ downloadArticlesWithUi<-function(db, webenv, querykey){
                  sep="&"),
                sep = "")
   )
-  print(r)
   warn_for_status(r)
   res_efecth<-content(r,"text") #résultat de la recherche au format json
-  write(res_efecth,file="pubmedRecord.xml")
+  articles.xml<<-generateFileName(res_efecth,"xml")
+  write(res_efecth,file=articles.xml)
 }

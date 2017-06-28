@@ -7,7 +7,18 @@ tabPanel("Consultation des articles",
              sidebarPanel(
                h4("Les résultats de votre recherche"),
                p("Ici s'affiche les résultats de la recherche d'articles 
-                 lancée dans l'onglet \"sélection des mots clés\"")
+                 lancée dans l'onglet \"sélection des mots clés\". Vous pouvez consulter 
+                 les articles en cliquant dessus. Si un article ne convient pas,
+                 retirer le de la sélection. Il faudra ensuite lancer le mapping pour
+                 analyser les articles"),
+               h4("Lancer le mapping des articles"),
+               fluidRow(
+                 column(12, 
+                        align="center",
+                        actionButton("startMapping", "Lancer le mapping")
+                 )
+               )
+               
              ),
              mainPanel(div(DT::dataTableOutput('articles_research'),align="center"))
            )

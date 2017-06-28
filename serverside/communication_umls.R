@@ -32,20 +32,24 @@ get_service_ticket<-function(url_service_ticket){
 
 # lancer une recherche avec mot clé
 research_term<-function(search_term){
+  retour<-NULL
   url= "https://uts-ws.nlm.nih.gov/rest/search/current"
+  save(url_service_ticket,file="url_service_ticket.RData")
+
   service_ticket = get_service_ticket(url_service_ticket)
-  query = list(ticket=service_ticket, string = search_term)
-  r<-GET(url,query=query)
+  pars = list(ticket=service_ticket, string = search_term)
+  save(pars,file="query.RData")
+
+  r<-GET(url,query=pars)
+  save(r,file="request.RData")
   warn_for_status(r)
-  search_results<-content(r,"text") #résultat de la recherche au format json
-  
-  #retourner les résultats sous la forme d'un data frame
-  result <- fromJSON(search_results)
+  search_results<-httr::content(r,"text")
+  result <- jsonlite::fromJSON(search_results)
   df<-as.data.frame(result$result$results)
-  if(df[1,]==c("NONE","NO RESULTS")){
-    return(NULL)
+  if(df[1,1]!="NONE"){
+    retour<-df
   }
-  return(df)
+  return(retour)
 }
 
 #5°) récupérer la définition d'un concept et ses atomes

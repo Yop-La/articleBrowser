@@ -113,12 +113,11 @@ observeEvent(input$addKeyConcept,{
   }
   names(key_concepts)[length(key_concepts)] <- concept_selectionne$concept$name
   key_concepts <<- key_concepts # pour que le changement de nom soit globale
-  # key_concepts <- key_concepts_tempo
   output$keyConcepts <-  renderUI({
-    selectizeInput("conceptsKey", 
-                   label= "Concepts que l'on va chercher dans les articles", 
-                   choices = names(key_concepts), 
-                   selected = names(key_concepts), 
+    selectizeInput("conceptsKey",
+                   label= "Concepts que l'on va chercher dans les articles",
+                   choices = names(key_concepts),
+                   selected = names(key_concepts),
                    multiple = TRUE,
                    options = NULL)
   })
@@ -131,10 +130,10 @@ observeEvent(input$conceptsKey, ignoreNULL = FALSE, ignoreInit = FALSE,{
   print(concepts_deleted)
   sapply(concepts_deleted, function(x) { key_concepts[[x]] <<- NULL })
   output$keyConcepts <-  renderUI({
-    selectizeInput("conceptsKey", 
-                   label= "Concepts à trouver dans les textes", 
-                   choices = names(key_concepts), 
-                   selected = names(key_concepts), 
+    selectizeInput("conceptsKey",
+                   label= "Concepts à trouver dans les textes",
+                   choices = names(key_concepts),
+                   selected = names(key_concepts),
                    multiple = TRUE,
                    options = NULL)
   })
@@ -178,7 +177,7 @@ observeEvent(input$findArticles,{
       )
       articles_research<<-processXmlPubmed()
       output$articles_research <- DT::renderDataTable({
-        datatable(articles_res, 
+        datatable(articles_research, 
                   selection = 'single',
                   rownames = FALSE,
                   options=list(

@@ -10,7 +10,7 @@
 #   - la date de création des articles pubmed 
 # cela concerne les articles renvoyés par la recherche d'articles
 setDataFramePArticles<-function(){
-  articles <- extrctPubmedArticle("pubmedRecord.xml")
+  articles <- extrctPubmedArticle(articles.xml)
   ret <- data.frame(matrix(unlist(articles), 
                                  nrow=length(articles), 
                                  byrow=T),stringsAsFactors = FALSE)
@@ -29,7 +29,5 @@ setDataFramePArticles<-function(){
 
 processXmlPubmed<-function(){
   tab_articles<-setDataFramePArticles()
-  # save(tab_articles[[5]],file = "abstracts.RData")  
-  # tab_articles[[5]]<-NULL
   return(tab_articles)
 }
