@@ -12,7 +12,7 @@ source("./serverside/formatXmlParsing.R",local=TRUE, encoding="utf-8")
 
 
 #pour lancer la recherche de concept quand sur le bouton "chercher"
-get_search_results <- eventReactive(input$search, {
+get_search_results <- eventReactive(input$butSearchConcept, {
   research_term(input$term)
 })
 

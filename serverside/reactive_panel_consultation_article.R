@@ -33,21 +33,6 @@ observeEvent(input$articles_research_rows_selected, {
 observeEvent(input$startMapping,{
   saveArticlesToMedlineFormat(articles_research,"./articles.medline")
   
-  # startMapping<<-future({
-  #   mappArticles("./articles.medline")
-  #   sender <- "alex.guillemine@gmail.com"
-  #   recipients <- sender
-  #   send.mail(from = sender,
-  #             to = sender,
-  #             subject = "Subject of the email",
-  #             body = "Body of the email",
-  #             smtp = list(host.name = "smtp.gmail.com", port = 587,
-  #                         user.name = sender,
-  #                         passwd = "Bgrnht12g!", ssl = TRUE),
-  #             authenticate = TRUE,
-  #             send = TRUE)
-  # }) %plan% multiprocess
-
 
   # mappArticles("./articles.medline")
   showModal(modalDialog(

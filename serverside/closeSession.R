@@ -1,5 +1,5 @@
 session$onSessionEnded(function(){
   print("hi")
-  value(startMapping)
+  mappArticles()
   print("bye")
 })

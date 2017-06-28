@@ -23,33 +23,31 @@ get_gtg<-function(){
 # ce ticket sera délivré avant l'utilisation d'un service
 get_service_ticket<-function(url_service_ticket){
   body_ticket = list(service = "http://umlsks.nlm.nih.gov")
-  r <- POST(url_service_ticket, body=body_ticket, encode = "form")
-  warn_for_status(r)
-  service_ticket<-content(r,"text") #expires after one use or 5 minutes
+  req_ticket <- POST(url_service_ticket, body=body_ticket, encode = "form")
+  warn_for_status(req_ticket)
+  service_ticket<-content(req_ticket,"text") #expires after one use or 5 minutes
   return(service_ticket)
 }
 
 
 # lancer une recherche avec mot clé
 research_term<-function(search_term){
-  retour<-NULL
-  url= "https://uts-ws.nlm.nih.gov/rest/search/current"
-  save(url_service_ticket,file="url_service_ticket.RData")
-
+  res_search_concept<-NULL
+  search_url= "https://uts-ws.nlm.nih.gov/rest/search/current"
+  print(url_service_ticket)
   service_ticket = get_service_ticket(url_service_ticket)
-  pars = list(ticket=service_ticket, string = search_term)
-  save(pars,file="query.RData")
-
-  r<-GET(url,query=pars)
-  save(r,file="request.RData")
-  warn_for_status(r)
-  search_results<-httr::content(r,"text")
-  result <- jsonlite::fromJSON(search_results)
-  df<-as.data.frame(result$result$results)
-  if(df[1,1]!="NONE"){
-    retour<-df
+  paras <- list(ticket=service_ticket, string = search_term)
+  req_concept<-GET(search_url,query=paras)
+  warn_for_status(req_concept)
+  search_results<-content(req_concept,"text")
+  save(search_results,file="tampon.json")
+  
+  conceptFound <- jsonlite::fromJSON(search_results)
+  tab_concept<-as.data.frame(conceptFound$result$results)
+  if(tab_concept[1,1]!="NONE"){
+    res_search_concept<-tab_concept
   }
-  return(retour)
+  return(res_search_concept)
 }
 
 #5°) récupérer la définition d'un concept et ses atomes

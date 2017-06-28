@@ -20,7 +20,7 @@ tabPanel("Spécification de la recherche",
                                   width = NULL, 
                                   placeholder = "Saisir les termes puis cliquez sur go")),
                  column(3,
-                        actionButton("search", "Go !"))),
+                        actionButton("butSearchConcept", "Go !"))),
                h4(HTML("Step 3 - Utiliser les concepts choisis")),
                htmlOutput("keyConcepts"),
                actionButton("findArticles", "Lancer la recherche d'articles")
