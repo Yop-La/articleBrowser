@@ -4,5 +4,5 @@
 concepts_table <<- NULL
 data_test <<- NULL
 concept_selectionne <<- list()
-key_concepts <<- list()
+key_concepts <- list()
 articles.xml<-"" #contient le nom du fichier xml des articles (retourné par pubmed) stocké localement

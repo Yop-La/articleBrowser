@@ -31,17 +31,26 @@ observeEvent(input$articles_research_rows_selected, {
 })
 
 observeEvent(input$startMapping,{
-  saveArticlesToMedlineFormat(articles_research,"./articles.medline")
-  
-
-  # mappArticles("./articles.medline")
-  showModal(modalDialog(
-    title = "En développement ...",
-    div("Vos articles sont en cours de mappage. Vous recevrez un mail une fois le mappage terminé avec un lien 
-        à utiliser dans l'application"),
-    footer = NULL,
-    easyClose = TRUE
-  ))
+  if(is.null(articles_research)){
+    ordreMapping <<- FALSE
+    showModal(modalDialog(
+      title = "Impossible de lancer le mapping",
+      div("Il faut d'abord chercher des articles avant de pouvoir les mapper"),
+      footer = NULL,
+      easyClose = TRUE
+    ))
+  }else{
+    ordreMapping <<- TRUE
+    saveArticlesToMedlineFormat(articles_research,"./articles.medline")
+    showModal(modalDialog(
+      title = "Ordre de mappage bien enregistré",
+      div("Le mappage des articles sera lancé à la fermeture de l'application.
+        Fermez donc cette onglet pour lancer le mappage. 
+        Un mail vous sera envoyé une fois l'opération terminé."),
+      footer = NULL,
+      easyClose = TRUE
+    ))
+  }
 })
 
 

@@ -40,10 +40,9 @@ research_term<-function(search_term){
   req_concept<-GET(search_url,query=paras)
   warn_for_status(req_concept)
   search_results<-content(req_concept,"text")
-  save(search_results,file="tampon.json")
-  
-  conceptFound <- jsonlite::fromJSON(search_results)
-  tab_concept<-as.data.frame(conceptFound$result$results)
+  load("tampon.RData")
+  conceptFound <- rjson::fromJSON(search_results)
+  tab_concept<-as.data.frame(matrix(unlist(conceptFound$result$results),byrow = TRUE,ncol=4))
   if(tab_concept[1,1]!="NONE"){
     res_search_concept<-tab_concept
   }
@@ -60,7 +59,7 @@ get_info_concept<-function(url_info_concept){
   warn_for_status(r)
   retour = list()
   search_results<-content(r,"text") #résultat de la recherche au format json
-  search_results<-fromJSON(search_results)
+  search_results<-jsonlite::fromJSON(search_results)
   
   #infos sur le concept
   retour$concept <- list()
@@ -102,7 +101,7 @@ get_defs_concept<-function(url_def_concept){
   r<-GET(url_def_concept,query=query)
   warn_for_status(r)
   search_results<-content(r,"text") #résultat de la recherche au format json
-  search_results<-fromJSON(search_results)
+  search_results<-jsonlite::fromJSON(search_results)
   return(search_results)
 }
 
@@ -113,7 +112,7 @@ get_atoms_concept<-function(url_atoms_concept){
   r<-GET(url_atoms_concept,query=query)
   warn_for_status(r)
   search_results<-content(r,"text") #résultat de la recherche au format json
-  search_results<-fromJSON(search_results)
+  search_results<-jsonlite::fromJSON(search_results)
   # on récupère le nombre de pages pour ensuite récupérer tous les atoms
   pageCount <- search_results$pageCount
   # on soumet la même requête en précisant qu'on veux tous les résultats sur une même page
@@ -122,7 +121,7 @@ get_atoms_concept<-function(url_atoms_concept){
   r<-GET(url_atoms_concept,query=query)
   warn_for_status(r)
   search_results<-content(r,"text") #résultat de la recherche au format json
-  search_results<-fromJSON(search_results)
+  search_results<-jsonlite::fromJSON(search_results)
   #suppresion d'un element de la liste pour transformation en data.frame
   search_results$result$contentViewMemberships<-NULL  
   return(search_results)

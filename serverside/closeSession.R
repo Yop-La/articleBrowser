@@ -1,5 +1,9 @@
 session$onSessionEnded(function(){
-  print("hi")
-  mappArticles()
-  print("bye")
+  print("Lancement du mapping")
+  if(ordreMapping){
+    ret<-mappArticles()  
+    print(ret)
+  }
+  print("Mapping terminé")
+  stopApp()
 })

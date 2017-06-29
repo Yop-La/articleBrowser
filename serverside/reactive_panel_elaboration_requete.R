@@ -12,8 +12,8 @@ source("./serverside/formatXmlParsing.R",local=TRUE, encoding="utf-8")
 
 
 #pour lancer la recherche de concept quand sur le bouton "chercher"
-get_search_results <- eventReactive(input$butSearchConcept, {
-  research_term(input$term)
+get_search_results <- eventReactive(input$butSearchConcept,{
+    research_term(input$terms)
 })
 
 #pour afficher le dans une datable le résultat de la recherche de concept
@@ -113,30 +113,28 @@ observeEvent(input$addKeyConcept,{
   }
   names(key_concepts)[length(key_concepts)] <- concept_selectionne$concept$name
   key_concepts <<- key_concepts # pour que le changement de nom soit globale
-  output$keyConcepts <-  renderUI({
-    selectizeInput("conceptsKey",
-                   label= "Concepts que l'on va chercher dans les articles",
-                   choices = names(key_concepts),
-                   selected = names(key_concepts),
-                   multiple = TRUE,
-                   options = NULL)
-  })
+  updateSelectizeInput(session, 
+                       "conceptsKey", 
+                       label= "Concepts à trouver dans les textes", 
+                       choices = names(key_concepts),
+                       selected = names(key_concepts), 
+                       options = list(), 
+                       server = FALSE)
   
 })
 
 # pour mettre à jour les concepts clés en cas de suppresion d'un de ses concepts par l'utilisateur
-observeEvent(input$conceptsKey, ignoreNULL = FALSE, ignoreInit = FALSE,{
+observeEvent(input$conceptsKey,{
   concepts_deleted <- setdiff(names(key_concepts),input$conceptsKey)
   print(concepts_deleted)
   sapply(concepts_deleted, function(x) { key_concepts[[x]] <<- NULL })
-  output$keyConcepts <-  renderUI({
-    selectizeInput("conceptsKey",
-                   label= "Concepts à trouver dans les textes",
-                   choices = names(key_concepts),
-                   selected = names(key_concepts),
-                   multiple = TRUE,
-                   options = NULL)
-  })
+  updateSelectizeInput(session, 
+                       "conceptsKey", 
+                       label= "Concepts à trouver dans les textes", 
+                       choices = names(key_concepts),
+                       selected = names(key_concepts), 
+                       options = list(), 
+                       server = FALSE)
 })
 
 # action du bouton "lancer la recherche d'articles"

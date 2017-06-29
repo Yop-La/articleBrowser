@@ -11,7 +11,6 @@ removeNonAsciiCharacter<-function(file){
 
 mappArticles<-function(){
   #pour gérer les caractères non ASCII
-  print("dedans")
   removeNonAsciiCharacter(articles.medline)
   .jinit('.')
   .jaddClassPath(dir( "./lib/", full.names=TRUE ))
