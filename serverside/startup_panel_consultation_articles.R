@@ -6,5 +6,4 @@ articles.medline <-"" #contient le chemin vers le fichier contenant les articles
 #contient le chemin vers le fichier contenant 
 #les articles au format medline sans caractères non ascii
 articles_ascii.medline <- "" 
-ordreMapping <- FALSE #pour lancer le mapping à la fermeture de l'application
 

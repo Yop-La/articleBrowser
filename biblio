@@ -9,3 +9,6 @@ HTML URL Encoding Reference : https://www.w3schools.com/tags/ref_urlencode.asp
 PubMed Help [Internet] - https://www.ncbi.nlm.nih.gov/books/NBK3827/
 The E-utilities In-Depth: Parameters, Syntax and More - https://www.ncbi.nlm.nih.gov/books/NBK25499/
 XPath : Localiser les données : https://openclassrooms.com/courses/structurez-vos-donnees-avec-xml/xpath-localiser-les-donnees
+Scaling and Performance Tuning with shinyapps.io : https://shiny.rstudio.com/articles/scaling-and-tuning.html
+shinyapps.io user guide : http://docs.rstudio.com/shinyapps.io/applications.html#active-hours
+A Future for R: A Comprehensive Overview - https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html

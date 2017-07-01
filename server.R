@@ -37,6 +37,5 @@ shinyServer(function(input, output, session) {
   # source("./serverside/reactive_panel_analyse_mapping.R",local=TRUE, encoding="utf-8")
   source("./serverside/reactive_panel_elaboration_requete.R",local=TRUE, encoding="utf-8")
   source("./serverside/reactive_panel_consultation_article.R",local=TRUE, encoding="utf-8")
-  source("./serverside/closeSession.R",local=TRUE, encoding="utf-8")  
   
 })

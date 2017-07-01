@@ -30,25 +30,49 @@ observeEvent(input$articles_research_rows_selected, {
   ))
 })
 
+output$statutMapping <- renderUI({
+  "Aucun mapping en cours"
+})
+
 observeEvent(input$startMapping,{
   if(is.null(articles_research)){
     ordreMapping <<- FALSE
     showModal(modalDialog(
       title = "Impossible de lancer le mapping",
       div("Il faut d'abord chercher des articles avant de pouvoir les mapper"),
-      footer = NULL,
-      easyClose = TRUE
+      easyClose = TRUE,
+      footer = NULL
     ))
-  }else{
-    ordreMapping <<- TRUE
+  }else{ 
+    
     saveArticlesToMedlineFormat(articles_research,"./articles.medline")
+    launchMapping<-function(){
+      jobMapping %<-% future({
+        resMapping = mappArticles()
+        resMapping
+      }) %plan% multiprocess
+      print("passé")
+      while (!resolved(jobMapping)) { #tant que le de job de mapping est en cours
+        print(resolved(jobMapping))
+        print(".")
+        #on peut vérifier que le mapping est bien lancé
+        #ici on récupère le statut du mapping et on l'affiche dans l'app avec le temps restant  
+      }
+      print("done")
+      # resMapping <- value(jobMapping)
+      return(jobMapping)
+    }
+    print(launchMapping())
+    #on lance le mapping dans un bloc future
+    
+    
     showModal(modalDialog(
-      title = "Ordre de mappage bien enregistré",
-      div("Le mappage des articles sera lancé à la fermeture de l'application.
-        Fermez donc cette onglet pour lancer le mappage. 
-        Un mail vous sera envoyé une fois l'opération terminé."),
-      footer = NULL,
-      easyClose = TRUE
+      title = "Lancement du mapping ....",
+      div("Le mappage des articles sera bientôt lancé. Vous pouvez avoir voir l'avcancement
+          du mapping et le temps restant dans la partie \"Statut Mapping\". Attention !! La fermeture
+          de l'application stoppe toute l'opération !!"),
+      easyClose = TRUE,
+      footer = NULL
     ))
   }
 })

@@ -17,8 +17,9 @@ tabPanel("Consultation des articles",
                         align="center",
                         actionButton("startMapping", "Lancer le mapping")
                  )
-               )
-               
+               ),
+               h4("Statut du mapping"),
+               htmlOutput("statutMapping", inline = FALSE)
              ),
              mainPanel(div(DT::dataTableOutput('articles_research'),align="center"))
            )

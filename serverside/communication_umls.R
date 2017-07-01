@@ -40,7 +40,6 @@ research_term<-function(search_term){
   req_concept<-GET(search_url,query=paras)
   warn_for_status(req_concept)
   search_results<-content(req_concept,"text")
-  load("tampon.RData")
   conceptFound <- rjson::fromJSON(search_results)
   tab_concept<-as.data.frame(matrix(unlist(conceptFound$result$results),byrow = TRUE,ncol=4))
   if(tab_concept[1,1]!="NONE"){

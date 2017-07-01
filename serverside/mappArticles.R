@@ -15,6 +15,6 @@ mappArticles<-function(){
   .jinit('.')
   .jaddClassPath(dir( "./lib/", full.names=TRUE ))
   obj=.jnew("TextMapper")
-  res=.jcall(obj,"Ljava/lang/String;","mapp",as.character(articles_ascii.medline))
-  return(res)
+  resMapp = .jcall(obj,"Ljava/lang/String;","mapp",as.character(articles_ascii.medline))
+  return(resMapp)
 }
