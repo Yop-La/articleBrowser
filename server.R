@@ -21,11 +21,14 @@ library(rjson)
 library(jsonlite)
 library(rJava)
 library(future)
-library(mailR)
+library(RCurl)
+
 
 
 source("./serverside/communication_umls.R", encoding="utf-8")
 source("./serverside/fileManager.R",local=TRUE, encoding="utf-8")
+source("./serverside/MetaMapStatus.R",local=TRUE, encoding="utf-8")
+options("encoding" = "UTF-8")
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {

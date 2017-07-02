@@ -47,19 +47,34 @@ observeEvent(input$startMapping,{
     
     saveArticlesToMedlineFormat(articles_research,"./articles.medline")
     launchMapping<-function(){
-      jobMapping %<-% future({
+      plan(multisession)
+      jobMapping %<-% ({
         resMapping = mappArticles()
         resMapping
-      }) %plan% multiprocess
-      print("passé")
-      while (!resolved(jobMapping)) { #tant que le de job de mapping est en cours
-        print(resolved(jobMapping))
-        print(".")
-        #on peut vérifier que le mapping est bien lancé
-        #ici on récupère le statut du mapping et on l'affiche dans l'app avec le temps restant  
+      })
+      f<-futureOf(jobMapping)
+      while (!resolved(f)) { #tant que le de job de mapping est en cours
+        statusTable<-getMappingStatus()
+        output$mapping_statut <<- DT::renderDataTable({
+          datatable(statusTable, 
+                    selection = 'none',
+                    rownames = FALSE,
+                    options=list(
+                      # bLengthChange = FALSE,
+                      # paging = FALSE,
+                      # pageLength = 10,
+                      searching = FALSE,
+                      columnDefs = list(list(
+                        visible=FALSE,
+                        targets=c(1)))
+                    )
+          )
+
+        })
+        cat("...")
+        Sys.sleep(10)
       }
       print("done")
-      # resMapping <- value(jobMapping)
       return(jobMapping)
     }
     print(launchMapping())

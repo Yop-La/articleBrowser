@@ -4,14 +4,16 @@
 
 
 removeNonAsciiCharacter<-function(file){
-  articles_ascii.medline<<-generateFileName("articles_ascii.medline","medline")
-  shell_command <- paste("java -jar replace_utf8.jar",file,">",articles_ascii.medline,sep=" ")
-  system(shell_command)
+  articles_ascii.medline<-generateFileName("articles_ascii.medline","medline")
+  shell_command <- paste("java -jar replace_utf8.jar",file,sep=" ")
+  inter<- system(shell_command,intern=TRUE)
+  write(inter,file=articles_ascii.medline)
+  return(articles_ascii.medline)
 }
 
 mappArticles<-function(){
   #pour gérer les caractères non ASCII
-  removeNonAsciiCharacter(articles.medline)
+  articles_ascii.medline<-removeNonAsciiCharacter(articles.medline)
   .jinit('.')
   .jaddClassPath(dir( "./lib/", full.names=TRUE ))
   obj=.jnew("TextMapper")
