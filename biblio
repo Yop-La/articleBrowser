@@ -12,3 +12,4 @@ XPath : Localiser les données : https://openclassrooms.com/courses/structurez-v
 Scaling and Performance Tuning with shinyapps.io : https://shiny.rstudio.com/articles/scaling-and-tuning.html
 shinyapps.io user guide : http://docs.rstudio.com/shinyapps.io/applications.html#active-hours
 A Future for R: A Comprehensive Overview - https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html
+xmlEventParse - https://www.rdocumentation.org/packages/XML/versions/3.98-1.7/topics/xmlEventParse

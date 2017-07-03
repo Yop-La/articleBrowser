@@ -19,10 +19,20 @@ tabPanel("Consultation des articles",
                  )
                ),
                h4("Statut du mapping"),
-               htmlOutput("statutMapping", inline = FALSE),
+               div("Le mapping peut durer quelques heures à quelques minutes. 
+                   Tout dépend de l'activité sur les serveurs. L'onglet statut du mapping
+                    permet d'avoir une estimation du temps restant."),
                div(DT::dataTableOutput('mapping_statut'),align="center")
              ),
-             mainPanel(div(DT::dataTableOutput('articles_research'),align="center"))
+             mainPanel(
+               tabsetPanel(
+                 tabPanel("Résulats de la recherche d'articles", 
+                          div(DT::dataTableOutput('articles_research'),align="center")),
+                 tabPanel("Statut du mapping", 
+                          htmlOutput("statutMapping"),
+                          div(DT::dataTableOutput('statutTable'),align="center"))
+               )
+             )
            )
          )
 )

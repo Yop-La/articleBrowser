@@ -7,3 +7,6 @@ articles.medline <-"" #contient le chemin vers le fichier contenant les articles
 #les articles au format medline sans caractères non ascii
 articles_ascii.medline <- "" 
 
+pathMapping<-NULL
+mappingInProgress <- FALSE
+mappingParsed <- FALSE

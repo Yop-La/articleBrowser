@@ -1,6 +1,6 @@
-# date création : 10/04/2017
+# date création : 03/07/2017
 # auteur : alexandre guillemine
-# pour générer les bases de données de l'appli shiny
+# pour parser le résultat du mapping et faire une bdd
 
 # entrée : semtypes
 # sortie : base de donnée
