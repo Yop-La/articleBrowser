@@ -6,7 +6,12 @@ articles.medline <-"" #contient le chemin vers le fichier contenant les articles
 #contient le chemin vers le fichier contenant 
 #les articles au format medline sans caractères non ascii
 articles_ascii.medline <- "" 
+# devra être remis à NULL à la fin du parsing pour savoir si un future mapping a bien été retrouvé sur le serveur
+pathMapping<-""
+stateMapping <- "noProcess"
+#si idMapping vaut NULL ou -1 au moment du parsage du Mapping, il faudra
+pathDownloadDone <- ""
+pathParsingDone <- ""
+pathParsing <- ""
 
-pathMapping<-NULL
-mappingInProgress <- FALSE
-mappingParsed <- FALSE
+startDownload<-NULL

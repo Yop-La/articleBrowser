@@ -27,7 +27,8 @@ library(RCurl)
 
 source("./serverside/communication_umls.R", encoding="utf-8")
 source("./serverside/fileManager.R",local=TRUE, encoding="utf-8")
-source("./serverside/MetaMapStatus.R",local=TRUE, encoding="utf-8")
+source("./serverside/communication_metamap.R",local=TRUE, encoding="utf-8")
+source("./serverside/parseMapping.R", encoding="utf-8")
 options("encoding" = "UTF-8")
 
 # Define server logic required to draw a histogram
@@ -35,6 +36,7 @@ shinyServer(function(input, output, session) {
   # source("./serverside/startup_panel_analyse_mapping.R", encoding="utf-8")
   source("./serverside/startup_panel_elaboration_requete.R", encoding="utf-8")
   source("./serverside/startup_panel_consultation_articles.R", encoding="utf-8")
+  
   
   
   # source("./serverside/reactive_panel_analyse_mapping.R",local=TRUE, encoding="utf-8")

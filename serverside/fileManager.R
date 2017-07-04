@@ -9,3 +9,12 @@ generateFileName <- function(data,extension) {
   fileName <- file.path("response", fileName)
   return(fileName)
 }
+
+clearDirectory<-function(pathDir){
+  listFiles <- as.list(list.files(pathDir,full.names = TRUE))
+  if(length(listFiles) != 0)
+    do.call(file.remove,listFiles)
+  write("to keep the directory",file="./response/readme")
+}
+
+

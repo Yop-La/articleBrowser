@@ -44,15 +44,6 @@ observeEvent(input$startMapping,{
       footer = NULL
     ))
   }else{ 
-    saveArticlesToMedlineFormat(articles_research,"./articles.medline")
-    pathMapping<<-generateFileName(sample(c("a","b","c","d","e","f"), 20, replace=T),"xml")
-    plan(multisession)
-    jobMapping %<-% ({
-      resMapping = mappArticles()
-      write(resMapping,file=pathMapping)
-      resMapping
-    })
-    mappingInProgress <<- TRUE
     showModal(modalDialog(
       title = "Lancement du mapping ....",
       div("Le mappage des articles sera bientôt lancé. Vous pouvez avoir voir l'avcancement
@@ -61,44 +52,146 @@ observeEvent(input$startMapping,{
       easyClose = TRUE,
       footer = NULL
     ))
+    clearDirectory("./response/")
+    saveArticlesToMedlineFormat(articles_research,"./articles.medline")
+    pathMapping<<-generateFileName(sample(c("a","b","c","d","e","f"), 20, replace=T),"xml")
+    pathDownloadDone<<-generateFileName(sample(c("a","b","c","d","e","f"), 20, replace=T),"text")
+    plan(multisession)
+    jobMapping %<-% {
+      mappArticles(pathMapping)
+      write("mapping downloaded",file=pathDownloadDone)
+    }
+    stateMapping <<- "mappingInProgress"
   }
 })
 
 
 
 observe({
-  statutInDiv<- h4("Pas de mapping en cours")
-  invalidateLater(10000)
-  if(mappingInProgress){
-    mappingParsed <<- FALSE
-    if(file.exists(pathMapping)){
-      statutInDiv<- h4("Mapping terminé")
-      mappingInProgress <<- FALSE
-      #on fait le parsage du mapping et on stocke le tout dans un dataframe
-      mappingParsed<<-TRUE
-    }else{
-      nitems <- nrow(articles_research)
-      # mappingTable<-getMappingStatus()
-      # load(file = "tampon.RData")
-      # statutMapping <- mappingTable[mappingTable$`NumberOf Items`==nitems & mappingTable$M == "R",c(1,7)]
-      statutInDiv<- h4("Mapping en cours ...")
+  invalidateLater(5000)
+  tableStatus<-data.frame()
+  parsingTable<-data.frame()
+  if(stateMapping == "mappingInProgress"){
+    tableStatus<-as.data.frame(getMappingStatus(),stringsAsFactors = FALSE)
+    if(nrow(tableStatus) != 0){
+      colnames(tableStatus) <- c("refNum",
+                                 "priority",
+                                 "M",
+                                 "NumberOfItems",
+                                 "ProcessedItems",
+                                 "NumberErros",
+                                 "ETOC",
+                                 "APT")
     }
-  }else{ # pas de mapping en cours
-    if(mappingParsed){
-      statutInDiv<- h4(HTML("Mapping terminé ! </br> Les résultats sont disponible dans \"Analyse du mapping\""))
-    }
+    output$statutTable <- DT::renderDataTable({
+      datatable(tableStatus, 
+                selection = 'none',
+                rownames = FALSE,
+                options=list(
+                  bLengthChange = FALSE,
+                  searching = FALSE
+                )
+      )
+    })
   }
+  
+  
+  if(stateMapping == "mappingInProgress"){
+    statutInDiv<- h4("Mapping en cours ...")
+    if(file.exists(pathMapping)){
+      stateMapping <<- "downloadInProgress"
+      startDownload <<- Sys.time()
+    }
+    
+  }else if(stateMapping == "downloadInProgress"){
+    
+    output$statutTable <- DT::renderDataTable({
+      datatable(data.frame(), 
+                selection = 'none',
+                rownames = FALSE,
+                options=list(
+                  bLengthChange = FALSE,
+                  searching = FALSE
+                )
+      )
+    })
+    
+    statutInDiv<- h4("Téléchargement en cours ...")
+    sizeMapping <- utils:::format.object_size(file.size(pathMapping), "auto")
+    dureeDownload <- difftime(
+      Sys.time(),
+      startDownload, 
+      units = "mins"
+    )
+    debit<-
+      debit<- utils:::format.object_size((file.size(pathMapping)/as.double(dureeDownload)), 
+                                         "auto")
+    
+    output$infosDownload <- renderUI({
+      HTML(paste(
+        paste(sizeMapping, " téléchargé sur 169 M en ",dureeDownload," minutes",sep=""),
+        paste("Soit ",debit," par minute.",sep=""),
+        sep="</br> "
+      ))
+    })
+    
+    
+    
+    if(file.exists(pathDownloadDone)){
+      stateMapping <<- "downloadDone"
+    }
+    
+  }else if(stateMapping == "downloadDone"){
+    output$infosDownload <- renderUI({
+      character(0)
+    })
+    statutInDiv<- h4("Téléchargement terminé !")
+    stateMapping <<- "parsingInProgress"
+    pathParsingDone <<-generateFileName(sample(c("a","b","c","d","e","f"), 20, replace=T),"txt")
+    pathParsing <<-generateFileName(sample(c("a","b","c","d","e","f"), 20, replace=T),"txt")
+    plan(multisession)
+    jobMapping %<-% {
+      parseMapping(pathMapping,pathParsing)
+      write("parsing done",file=pathParsingDone)
+    }
+    
+  }else if(stateMapping == "parsingInProgress"){
+    if(file.exists(pathParsingDone)){
+      stateMapping <<- "parsingDone"
+    }
+    statutInDiv<- h4("Parsing en cours ...")
+    
+  }else if(stateMapping == "parsingDone"){
+    statutInDiv<- h4(HTML("Parsing terminé !"))
+    parsingTable <- read.csv(pathParsing,header = FALSE)
+    parsingTable<-unique.data.frame(parsingTable)
+    output$parsingTable <- DT::renderDataTable({
+      datatable(parsingTable, 
+                selection = 'none',
+                rownames = FALSE,
+                options=list(
+                  bLengthChange = FALSE,
+                  searching = FALSE
+                )
+      )
+    })
+    stateMapping <<- "resultReady"
+    
+  }else if(stateMapping == "resultReady"){
+    statutInDiv<- h4(HTML("Mapping terminé ! </br> 
+                            Les résultats sont disponible dans \"Analyse du mapping\""))
+  }else if(stateMapping == "noProcess"){
+    statutInDiv<- h4("Pas de mapping en cours")
+  }
+  
   output$statutMapping <- renderUI({
     statutInDiv
   })
-  output$statutTable <- DT::renderDataTable({
-    datatable(getMappingStatus(), 
-              selection = 'none',
-              rownames = FALSE,
-              options=list(
-                bLengthChange = FALSE,
-                searching = FALSE
-              )
-    )
-  })
+  
+  
+  
+  
+  
+  
+  
 })
