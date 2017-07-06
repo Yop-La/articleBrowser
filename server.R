@@ -29,6 +29,11 @@ source("./serverside/communication_umls.R", encoding="utf-8")
 source("./serverside/fileManager.R",local=TRUE, encoding="utf-8")
 source("./serverside/communication_metamap.R",local=TRUE, encoding="utf-8")
 source("./serverside/parseMapping.R", encoding="utf-8")
+
+semTypesTable<-read.csv(file="./data/SemanticTypes_2013AA.txt",sep="|")
+
+
+
 options("encoding" = "UTF-8")
 
 # Define server logic required to draw a histogram

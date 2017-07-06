@@ -16,4 +16,4 @@ pathParsing <- ""
 pathDownloadDone <- ""
 beginDownload<-NULL
 idMapping <- NULL
-
+mappingTable<-data.frame()

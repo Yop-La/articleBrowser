@@ -188,6 +188,8 @@ observe({
     pathParsing <<-generateFileName(sample(c("a","b","c","d","e","f"), 20, replace=T),"txt")
     plan(multisession)
     jobMapping %<-% {
+      semTypesTable
+      # pathMapping="./response/1499378334_0685f72e019b14265e98542a33cc1b65.xml"
       parseMapping(pathMapping,pathParsing)
       write("parsing done",file=pathParsingDone)
     }
@@ -196,14 +198,18 @@ observe({
     if(file.exists(pathParsingDone)){
       stateMapping <<- "parsingDone"
     }
+    refreshInfosStatut("Tout le mapping est bien téléchargé ! Le parsing est en maintenant en cours ...")
     statutInDiv<- h4("Parsing en cours ...")
     
   }else if(stateMapping == "parsingDone"){
     statutInDiv<- h4(HTML("Parsing terminé !"))
-    parsingTable <- read.csv(pathParsing,header = FALSE)
-    parsingTable<-unique.data.frame(parsingTable)
+    refreshInfosStatut("")
+    mappingTable<<-read.csv(pathParsing,
+                            header = FALSE,
+                            col.names = c("PMID","phraseID","token","CUI","concpteName",levels(semTypesTable$aapp)))
+    refreshInfosStatut(paste("La table de mapping compte : ",nrow(mappingTable)," lignes"))
     output$parsingTable <- DT::renderDataTable({
-      datatable(parsingTable, 
+      datatable(mappingTable[c(1,2),], 
                 selection = 'none',
                 rownames = FALSE,
                 options=list(

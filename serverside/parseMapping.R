@@ -8,149 +8,140 @@
 # en ligne concepts des articles
 # attention un même concept dans une même portion de phrase peut avoir plusieurs SemTypes
 
+
+# Description de la lecture à faire :
+#   
+#   parcourir chaque balise Utterance
+#     récupérer le <PMID>
+#     récupérer <UttText> pour générer un identifiant de UttText
+#     aller dans la balise <Phrases>
+#       parcourir chaque <Phrase>
+#         récupérer <PhraseText>
+#           Aller dans la balise <Mappings>
+#             Aller dans la première baslise <Mapping>
+#               Aller dans la balise <MappingCandidates>
+#                 Parcourir chaque <Candidate> ->>>> new row
+#                   Récupérer <CandidateCUI>
+#                   Récupérer <CandidateMatched>
+#                   Aller dans <SemTypes>
+#                     Parcourir <SemType> et récupérer le text
+#         
+write.row.csv<-function(row,pathParsing){
+  write(paste('"',paste(row,collapse='","'),'"',sep=""),
+        pathParsing,
+        append = TRUE)
+}
+
+setSemTypes<-function(row,semType){
+  firstIndiceSemTypes <- 6 # à changer si on ajoute des éléments à la ligne
+  allSemTypes <-semTypesTable$aapp
+  rowSemTypesToAdd <- allSemTypes == semType
+  nbSemTypes <- length(allSemTypes)
+  if(length(row) < nbSemTypes){
+    return(c(row,rowSemTypesToAdd))
+  }else{
+    
+    rowSemTypes = row[firstIndiceSemTypes:(firstIndiceSemTypes-1+nbSemTypes)]
+    
+    
+    rowSemTypes = rowSemTypesToAdd | as.logical(rowSemTypes)
+    row[firstIndiceSemTypes:(firstIndiceSemTypes-1+nbSemTypes)] <- rowSemTypes
+  }
+  return(row)
+}
+
 parseMapping<-function(pathMapping,pathParsing){
+  if(file.exists(pathParsing)){
+    file.remove(pathParsing)
+  }
+  file.create(pathParsing)
   xmlEventParse(pathMapping,
                 handlers = list(
                   startElement=function(name, attrs,.state = state){
+                    .state$name<- name
                     
-                    if(name=="PMID"){
-                      .state=1
-                      # write(name,pathParsing,append = TRUE)
-                      .state
+                    
+                    if(name == "UttText"){
+                      .state$idUttText = .state$idUttText + 1
+                      .state$row[2] <- .state$idUttText
                     }
+                    
+                    if(name == "Mappings"){
+                      .state$inFirstMapping = FALSE
+                      .state$indiceMapping = 0
+                      
+                    }
+                    
+                    if(name == "Mapping"){
+                      .state$indiceMapping = .state$indiceMapping + 1
+                      if(.state$indiceMapping == 1){
+                        .state$inFirstMapping = TRUE
+                      }else{
+                        .state$inFirstMapping = FALSE
+                      }
+                      
+                    }
+                    
+                    if(name == "SemTypes" & .state$inFirstMapping){
+                      .state$nbSemType = attrs[1]
+                      .state$indiceSemType = 0
+                      if(.state$nbSemType == 0){
+                        .state$row <- setSemTypes(.state$row,"pasunsemtype")
+                        write.row.csv(.state$row,pathParsing)
+                        .state$row=.state$row[1:5]
+                      }
+                    }
+                    
+                    
                     .state
                   },
-                  text=function(content,.state  = state){
-                    if(.state==1){
-                      write(content,pathParsing,append = TRUE)
+                  text=function(content,.state = state){
+                    
+                    if(.state$name=="PMID"){
+                      .state$row[1] <- content
+                      
                     }
-                    .state
-                  },
-                  endElement=function(name, attrs,.state  = state){
-                    if(name=="PMID"){
-                      .state=0
-                      # write(name,pathParsing,append = TRUE)
+                    
+                    if(.state$name=="PhraseText"){
+                      .state$row[3] <- content
                     }
+                    
+                    if(.state$name=="CandidateCUI" & .state$inFirstMapping){
+                      .state$row[4] <- content
+                    }
+                    if(.state$name=="CandidateMatched" & .state$inFirstMapping){
+                      .state$row[5] <- content
+                    }
+                    if(.state$name=="SemType" & .state$inFirstMapping){
+                      .state$row <- setSemTypes(.state$row,content)
+                      .state$indiceSemType = .state$indiceSemType + 1
+                      if(.state$nbSemType==.state$indiceSemType){
+                        write.row.csv(.state$row,pathParsing)
+                        .state$row=.state$row[1:5]
+                      }
+                    }
+                    
+                    
                     .state
-                  }),
-                state = 0)
+                  }
+                  # ,
+                  # endElement=function(name, attrs,state=.state){
+                  #   if(name=="SemTypes"){
+                  # 
+                  #   }
+                  #   .state
+                  # }
+                ),
+                state = list(idUttText=0,row=character(1),inFirstMapping=FALSE,count=0))
 }
-# parseMapping("./response/example_formated.xml")
 
-
-
-
-bordel<-function(){
-  xmls=list()
-  file.names = dir("./mapping_results/", pattern =".xml")
-  for(i in 1:length(file.names)){
-    
-    xmls[[i]] = xmlParse(paste("./mapping_results/",file.names[i],sep=""))
-  }
-  
-  
-  
-  getData=function(){
-    retour = character()
-    
-    
-    
-    finalDf = data.frame(PMID=character(),
-                         phraseText = character(),
-                         CUI=character(),
-                         concept = character(),
-                         semTypes = character(),
-                         linkToTLS = logical(),
-                         stringsAsFactors = FALSE)
-    for(i in 1:length(xmls)){
-      
-      
-      
-      xmlPathBase = paste("//Utterance/descendant::Phrase",sep = "")
-      
-      xmlPathPMID = "//Utterance/PMID"
-      xmlPathPhraseText = paste(xmlPathBase,"/PhraseText",sep="")
-      xmlPathNbMappings = paste(xmlPathBase,"/Mappings",sep="")
-      xmlPathCui = paste(xmlPathBase,"/Mappings/Mapping[position() = 1]/descendant::Candidate/CandidateCUI",sep="")
-      xmlPathPreferred = paste(xmlPathBase,"/Mappings/Mapping[position() = 1]/descendant::Candidate/CandidatePreferred",sep="")
-      xmlPathSemTypes = paste(xmlPathBase,"/Mappings/Mapping[position() = 1]/descendant::Candidate/descendant::SemType",sep="")
-      xmlPathMatched = paste(xmlPathBase,"/Mappings/Mapping[position() = 1]/descendant::Candidate/descendant::MatchedWord",sep="")
-      xmlFinal = paste(xmlPathNbMappings,"|",xmlPathPMID,"|",xmlPathCui,"|",xmlPathPhraseText,"|",xmlPathPreferred,"|",xmlPathMatched,"|",xmlPathSemTypes)
-      resPhraseText=xpathApply(xmls[[i]],xmlFinal)
-      
-      row = NULL
-      firstUtterance = TRUE
-      dfInter=NULL
-      hasMappings=FALSE
-      isLinkToTls = FALSE
-      PMID = NULL
-      phraseText = NULL
-      
-      for (j in seq_along(resPhraseText)){
-        xmlNode = resPhraseText[[j]]
-        xmlName = xmlName(xmlNode)
-        xmlValue = xmlValue(xmlNode)
-        xmlAttrs = xmlAttrs(xmlNode)
-        
-        
-        if(xmlName=="PMID"){
-          if(!firstUtterance){
-            if(isLinkToTls){
-              dfInter$linkToTLS[] = TRUE 
-              isLinkToTls = FALSE
-            }
-            finalDf=rbind(finalDf,dfInter) 
-          }
-          firstUtterance=FALSE
-          dfInter = data.frame(PMID=character(),
-                               phraseText = character(),
-                               CUI=character(),
-                               concept = character(),
-                               semTypes = character(),
-                               linkToTLS = logical(),
-                               stringsAsFactors = FALSE)
-          
-          
-          PMID = xmlValue
-        }
-        if(xmlName=="PhraseText"){
-          phraseText = xmlValue
-        }
-        if(xmlName=="Mappings"){
-          if(xmlAttrs["Count"]=="0"){
-            hasMappings = FALSE
-          }else{
-            hasMappings = TRUE
-          }
-          
-        }
-        if(hasMappings){
-          if(xmlName=="CandidateCUI"){
-            row = character(6)
-            row[1] = PMID
-            row[2] = phraseText
-            row[3] = xmlValue
-            if(xmlValue == "C4277544"){
-              isLinkToTls = TRUE
-            }
-          }
-          if(xmlName=="CandidatePreferred"){
-            row[4] = xmlValue
-          }
-          if(xmlName=="SemType"){
-            row[5] = xmlValue
-            row[6] = FALSE
-            dfInter[nrow(dfInter)+1,]=row
-          }
-        }
-      }
-    }
-    return(finalDf)
-  }
-  
-  df=getData()
-  save(df,file = "data.RData")
-  
-  res<-df[df$CUI == "C4277544","PMID"]
-  length(unique(res))
-}
+                     
+                     
+    # finalDf = data.frame(PMID=character(),
+    #                      phraseText = character(),
+    #                      CUI=character(),
+    #                      concept = character(),
+    #                      semTypes = character(),
+    #                      linkToTLS = logical(),
+    #                      stringsAsFactors = FALSE)
+    # 

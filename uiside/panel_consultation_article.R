@@ -31,7 +31,8 @@ tabPanel("Consultation des articles",
                  tabPanel("Statut du mapping", 
                           htmlOutput("statutMapping"),
                           htmlOutput("infosStatut"),
-                          div(DT::dataTableOutput('statutTable'),align="center"))
+                          div(DT::dataTableOutput('statutTable'),align="center"),
+                          div(DT::dataTableOutput('parsingTable'),align="center"))
                )
              )
            )

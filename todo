@@ -1,3 +1,7 @@
 todo :
 
 - corriger le bug qui se produit quand une recherche d'uid renvoie trop d'enregistrements (quand on tape obeisty pex)
+- mettre en place verouillage quand mapping
+- afficher des infos de téléchargement exact
+- si possible réécrire api java en R
+- faire en sorte de pouvoir relancer proprement une deuxième recherche et un deuxième mapping
