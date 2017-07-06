@@ -11,13 +11,12 @@ removeNonAsciiCharacter<-function(file){
   return(articles_ascii.medline)
 }
 
-mappArticles<-function(pathMapping){
+mappArticles<-function(articles.medline){
   #pour gérer les caractères non ASCII
   articles_ascii.medline<-removeNonAsciiCharacter(articles.medline)
   .jinit('.')
   .jaddClassPath(dir( "./lib/", full.names=TRUE ))
   obj=.jnew("MetaMap/TextMapper")
-  .jcall(obj,"Ljava/lang/String;","mapp",
-         as.character(articles_ascii.medline),
-         as.character(pathMapping))
+  .jcall(obj,"Ljava/lang/String;","submit",
+         as.character(articles_ascii.medline))
 }

@@ -30,9 +30,8 @@ tabPanel("Consultation des articles",
                           div(DT::dataTableOutput('articles_research'),align="center")),
                  tabPanel("Statut du mapping", 
                           htmlOutput("statutMapping"),
-                          htmlOutput("infosDownload"),
-                          div(DT::dataTableOutput('statutTable'),align="center"),
-                          div(DT::dataTableOutput('parsingTable'),align="center"))
+                          htmlOutput("infosStatut"),
+                          div(DT::dataTableOutput('statutTable'),align="center"))
                )
              )
            )

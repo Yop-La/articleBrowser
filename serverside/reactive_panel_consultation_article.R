@@ -7,6 +7,13 @@ source("./serverside/formatToMedline.R",local=TRUE, encoding="utf-8")
 source("./serverside/mappArticles.R",local=TRUE, encoding="utf-8")
 
 
+
+refreshInfosStatut<-function(msg){
+  output$infosStatut <- renderUI({
+    msg
+  })
+}
+
 # pour afficher le résumé de l'article cliqué
 observeEvent(input$articles_research_rows_selected, {
   input$table_rows_selected
@@ -53,15 +60,14 @@ observeEvent(input$startMapping,{
       footer = NULL
     ))
     clearDirectory("./response/")
-    saveArticlesToMedlineFormat(articles_research,"./articles.medline")
-    pathMapping<<-generateFileName(sample(c("a","b","c","d","e","f"), 20, replace=T),"xml")
-    pathDownloadDone<<-generateFileName(sample(c("a","b","c","d","e","f"), 20, replace=T),"text")
+    articles.medline <<- saveArticlesToMedlineFormat(articles_research)
     plan(multisession)
     jobMapping %<-% {
-      mappArticles(pathMapping)
-      write("mapping downloaded",file=pathDownloadDone)
+      mappArticles(articles.medline)
     }
     stateMapping <<- "mappingInProgress"
+    pathMapping <<- generateFileName(sample(c("a","b","c","d","e","f"), 20, replace=T),"xml")
+    pathDownloadDone <<- generateFileName(sample(c("a","b","c","d","e","f"), 20, replace=T),"RData")
   }
 })
 
@@ -69,71 +75,102 @@ observeEvent(input$startMapping,{
 
 observe({
   invalidateLater(5000)
-  tableStatus<-data.frame()
   parsingTable<-data.frame()
-  if(stateMapping == "mappingInProgress"){
-    tableStatus<-as.data.frame(getMappingStatus(),stringsAsFactors = FALSE)
-    if(nrow(tableStatus) != 0){
-      colnames(tableStatus) <- c("refNum",
-                                 "priority",
-                                 "M",
-                                 "NumberOfItems",
-                                 "ProcessedItems",
-                                 "NumberErros",
-                                 "ETOC",
-                                 "APT")
-    }
-    output$statutTable <- DT::renderDataTable({
-      datatable(tableStatus, 
-                selection = 'none',
-                rownames = FALSE,
-                options=list(
-                  bLengthChange = FALSE,
-                  searching = FALSE
-                )
-      )
-    })
+  
+  tableStatus<-as.data.frame(getMappingStatus(),stringsAsFactors = FALSE)
+  if(nrow(tableStatus) != 0){
+    colnames(tableStatus) <- c("refNum",
+                               "priority",
+                               "M",
+                               "NumberOfItems",
+                               "ProcessedItems",
+                               "NumberErros",
+                               "ETOC",
+                               "APT")
+  }else{
+    tableStatus<-data.frame("Aucun mapping en cours ...")
+    colnames(tableStatus) <- "Activité sur le serveur"
   }
+  output$statutTable <- DT::renderDataTable({
+    datatable(tableStatus, 
+              selection = 'none',
+              rownames = FALSE,
+              options=list(
+                bLengthChange = FALSE,
+                searching = FALSE
+              )
+    )
+  })
+  
   
   
   if(stateMapping == "mappingInProgress"){
     statutInDiv<- h4("Mapping en cours ...")
-    if(file.exists(pathMapping)){
-      stateMapping <<- "downloadInProgress"
-      startDownload <<- Sys.time()
+    refreshInfosStatut(HTML(paste("Le mapping des articles est en cours. Vous pouvez consulter l'avancement du mapping
+                           à l'aide du tableau donné ci dessous. Ce tableau affiche tous les processus de mapping
+                           en cours sur le serveur. Pour trouver votre processus, regarder le nombre d'items. Le
+                           nombre d'items de votre tâche est : ",
+                                  nrow(articles_research),
+                                  "</br>",
+                                  "Le tableau est mise à jour toutes les 5 secondes. Votre processus de mapping peut mettre une
+                                  vingtaine de secondes à apparaitre dans ce tableau")))
+    
+    ret = setIdMapping(tableStatus)
+    if(length(ret) != 0){
+      if(ret==-1){
+        stateMapping <<- "error"
+      }else if(!is.null(idMapping)){
+        
+        idMappingBis <- tableStatus[tableStatus[[1]] == idMapping,1]
+        if(length(as.character(idMappingBis)) == 0){
+          stateMapping <<- "startupDownload"
+          beginDownload <<- Sys.time()
+        }
+      }
+    }
+  }else if(stateMapping == "startupDownload"){
+    statutInDiv <- h4("Demarrage du téléchargement")
+    refreshInfosStatut(HTML("Le mapping est terminé. Les résultats sont en cours de téléchargement ..."))
+    plan(multisession)
+    
+    downloadJob %<-% {
+      result = tryCatch({
+        downloadResMapping(idMapping,pathMapping)
+        write(file = pathDownloadDone, "done")
+      }, error = function(e) {
+        write(file = pathDownloadDone, "fail")
+      })
     }
     
+    if(file.exists(pathMapping)){
+      stateMapping <<- "downloadInProgress"
+    }
+    
+    if(file.exists(pathDownloadDone)){
+
+      if(readLines(pathDownloadDone) == "fail"){
+        stateMapping <<- "error"
+      }
+    }
+    
+    
   }else if(stateMapping == "downloadInProgress"){
-    
-    output$statutTable <- DT::renderDataTable({
-      datatable(data.frame(), 
-                selection = 'none',
-                rownames = FALSE,
-                options=list(
-                  bLengthChange = FALSE,
-                  searching = FALSE
-                )
-      )
-    })
-    
     statutInDiv<- h4("Téléchargement en cours ...")
     sizeMapping <- utils:::format.object_size(file.size(pathMapping), "auto")
     dureeDownload <- difftime(
       Sys.time(),
-      startDownload, 
+      beginDownload, 
       units = "mins"
     )
     debit<-
       debit<- utils:::format.object_size((file.size(pathMapping)/as.double(dureeDownload)), 
                                          "auto")
     
-    output$infosDownload <- renderUI({
-      HTML(paste(
-        paste(sizeMapping, " téléchargé sur 169 M en ",dureeDownload," minutes",sep=""),
-        paste("Soit ",debit," par minute.",sep=""),
-        sep="</br> "
-      ))
-    })
+    msg<-HTML(paste(
+      paste(sizeMapping, " téléchargé sur 169 M en ",dureeDownload," minutes",sep=""),
+      paste("Soit ",debit," par minute.",sep=""),
+      sep="</br> "))
+    refreshInfosStatut(msg)
     
     
     
@@ -180,13 +217,26 @@ observe({
   }else if(stateMapping == "resultReady"){
     statutInDiv<- h4(HTML("Mapping terminé ! </br> 
                             Les résultats sont disponible dans \"Analyse du mapping\""))
+    idMapping <- NULL
   }else if(stateMapping == "noProcess"){
     statutInDiv<- h4("Pas de mapping en cours")
+    idMapping <- NULL
+  }else if(stateMapping == "error"){
+    showModal(modalDialog(
+      title = "Lancement du mapping ....",
+      div("Quelque chose s'est mal déroulé ! Relancez la procédure !"),
+      easyClose = TRUE,
+      footer = NULL
+    ))
+    stateMapping <<- "noProcess"
+    refreshInfosStatut("Erreur lors du téléchargement ou lors du lancement du mapping ... Relancez le mapping")
   }
   
   output$statutMapping <- renderUI({
     statutInDiv
   })
+  
+  
   
   
   

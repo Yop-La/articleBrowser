@@ -3,7 +3,7 @@
 # ce script est appelé dans server.R. 
 
 
-saveArticlesToMedlineFormat<-function(dataframe, pathFile){
+saveArticlesToMedlineFormat<-function(dataframe){
   toSave<-apply(X = dataframe, 
         MARGIN = 1, 
         FUN = function(x){
@@ -13,8 +13,9 @@ saveArticlesToMedlineFormat<-function(dataframe, pathFile){
           abstract = paste(abstract,"\n",sep="")
           return(c(PMID,title,abstract))
         })
-  articles.medline<<-generateFileName(toSave,"medline")
+  articles.medline<-generateFileName(toSave,"medline")
   write(toSave, articles.medline,sep="\n")
+  return(articles.medline)
 }
 
 

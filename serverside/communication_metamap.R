@@ -15,7 +15,7 @@ setIdMapping<-function(tableStatus){
     if(length(idsMapping) == 1){
       idMapping <<- idsMapping
     }else if(length(idsMapping ) >= 2){
-      idMapping <<- -1 
+      idMapping <<- -1
     }
   }
   return(idMapping)
@@ -35,9 +35,8 @@ connectToUMLS<-function(){
   return(r)
 }
 
-downloadResMapping<-function(idMapping){
+downloadResMapping<-function(idMapping,pathMapping){
   if(idMapping != -1 & !is.null(idMapping)){
-    pathMapping<<-generateFileName(sample(c("a","b","c","d","e","f"), 20, replace=T),"xml")
     cookies_rconnect<-cookies(connectToUMLS())  
     
     urlGetXml <- paste(
@@ -53,6 +52,15 @@ downloadResMapping<-function(idMapping){
     url <- r$all_headers[[1]]$headers$location
     cookies <- cookies(r)
     r <- GET(url,
+             set_cookies(
+               JSESSIONID=cookies_rconnect[1,"value"],
+               CASTGC=cookies_rconnect[2,"value"]
+               
+             )
+             
+    )
+    
+    r <- GET(paste(urlGetXml,"text.out",sep="/"),
              set_cookies(
                JSESSIONID=cookies_rconnect[1,"value"],
                CASTGC=cookies_rconnect[2,"value"]

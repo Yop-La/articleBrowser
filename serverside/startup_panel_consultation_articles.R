@@ -10,8 +10,10 @@ articles_ascii.medline <- ""
 pathMapping<-""
 stateMapping <- "noProcess"
 #si idMapping vaut NULL ou -1 au moment du parsage du Mapping, il faudra
-pathDownloadDone <- ""
+
 pathParsingDone <- ""
 pathParsing <- ""
+pathDownloadDone <- ""
+beginDownload<-NULL
+idMapping <- NULL
 
-startDownload<-NULL
